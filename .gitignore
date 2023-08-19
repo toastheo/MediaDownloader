@@ -1,0 +1,124 @@
+## User-spezifische Dateien
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+## Ordner-Struktur Configurationsdatei
+Desktop.ini
+
+## Recycle Bin verwendet auf Dateisystemfett
+$RECYCLE.BIN/
+
+## VS Code Patches
+*.patch
+
+## Windows Binärdateien
+*.dll
+*.exe
+*.pdb
+*.cache
+*.winmd
+*.ilk
+
+## Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+## Installer Dateien
+*.cab
+*.msi
+*.msm
+*.msp
+
+## Windows Shortcut Dateien
+*.lnk
+
+## Windows Forms auto generated
+*.Designer.cs
+*.resx
+
+## ASP.NET is web
+wwwroot/
+*.config
+
+## .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+**/Properties/launchSettings.json
+
+## Tye
+.tye/
+
+## Rider
+.idea/
+
+## Visual Studio für Mac
+.vscode/
+*.suo
+*.ntvsloa*
+
+## Windows image file caches
+FACES/
+
+## Windows Installer Dateien
+*.cab
+*.msi
+*.msm
+*.msp
+
+## Windows Shortcut Dateien
+*.lnk
+
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Tye
+.tye/
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# Windows Shortcut files
+*.lnk
+
+## Untracked files
+*.tmp
+*.bak
+*.swp
+*.kate-swp
+*.vspscc
+*.vssscc
+*.vscode
+
+# OS generated
+.DS_Store*
+ehthumbs.db
+Icon?
+Thumbs.db
+
+# Object and Binary directories
+obj/
+bin/
