@@ -9,6 +9,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using YoutubeExplode.Videos;
@@ -19,8 +20,18 @@ namespace YoutubeDownloader
 {
     public partial class Form1
     {
-        private async void DownloadVideoAsMP4()
+        private string videoFileName = null;
+        private string audioFileName = null;
+        private string mergedFileName = null;
+
+        private async Task DownloadVideoAs(string format, CancellationToken cancellationToken)
         {
+            if (format != "mp4" && format != "mkv")
+            {
+                _ = MessageBox.Show("Unkown video format!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
             try
             {
                 Video video = await youtube.Videos.GetAsync(url);
@@ -76,26 +87,28 @@ namespace YoutubeDownloader
                 if (videoStreamInfo != null && audioStreamInfo != null)
                 {
                     string sanitizedTitle = SanitizeFileName(video.Title);
-                    string videoFileName = $"{downloadPath}\\{sanitizedTitle}_video.{videoStreamInfo.Container}";
-                    string audioFileName = $"{downloadPath}\\{sanitizedTitle}_audio.{audioStreamInfo.Container}";
+                    videoFileName = $"{downloadPath}\\{sanitizedTitle}_video.{videoStreamInfo.Container}";
+                    audioFileName = $"{downloadPath}\\{sanitizedTitle}_audio.{audioStreamInfo.Container}";
 
                     Progress<double> progressHandler = new Progress<double>(percent => ProgressBar.Value = (int)(percent * 100));
 
                     ProgressLabel.Text = "Downloading Video ...";
                     StepLabel.Text = "Step 1 of 3";
-                    await youtube.Videos.Streams.DownloadAsync(videoStreamInfo, videoFileName, progressHandler);
+                    cancellationToken.ThrowIfCancellationRequested();
+                    await youtube.Videos.Streams.DownloadAsync(videoStreamInfo, videoFileName, progressHandler, cancellationToken);
 
                     ProgressLabel.Text = "Downloading Audio ...";
                     StepLabel.Text = "Step 2 of 3";
-                    await youtube.Videos.Streams.DownloadAsync(audioStreamInfo, audioFileName, progressHandler);
+                    cancellationToken.ThrowIfCancellationRequested();
+                    await youtube.Videos.Streams.DownloadAsync(audioStreamInfo, audioFileName, progressHandler, cancellationToken);
 
                     // merge files together
                     ProgressLabel.Text = "Merging files together ...";
                     StepLabel.Text = "Step 3 of 3";
 
-                    string mergedFileNameOriginal = $"{downloadPath}\\{sanitizedTitle}.mp4";
-                    string mergedFileName = GetUniqueFileName(mergedFileNameOriginal);
-                    await MergeVideoAndAudio(videoFileName, audioFileName, mergedFileName);
+                    string mergedFileNameOriginal = $"{downloadPath}\\{sanitizedTitle}.{format}";
+                    mergedFileName = GetUniqueFileName(mergedFileNameOriginal);
+                    await MergeVideoAndAudio(videoFileName, audioFileName, mergedFileName, format, cancellationToken);
                     File.Delete(videoFileName);
                     File.Delete(audioFileName);
 
@@ -108,9 +121,13 @@ namespace YoutubeDownloader
                     }
                     else
                     {
-                        ProgressTextBox.Clear();
-                        ProgressTextBox.SelectionColor = Color.Red;
-                        ProgressTextBox.AppendText("Download failed!");
+                        if (ProgressTextBox != null && !ProgressTextBox.IsDisposed)
+                        {
+                            ProgressTextBox.Clear();
+                            ProgressTextBox.SelectionColor = Color.Red;
+                            ProgressTextBox.AppendText("Download failed!");
+                        }
+                        CleanUpFiles();
                     }
                 }
                 else
@@ -119,23 +136,31 @@ namespace YoutubeDownloader
                     ProgressTextBox.Clear();
                     ProgressTextBox.SelectionColor = Color.Red;
                     ProgressTextBox.AppendText("Download failed!");
+                    CleanUpFiles();
                 }
             }
             catch (Exception ex)
             {
-                HandleExeption(ex);
+                HandleException(ex);
             }
             finally
             {
-                EnableButtons(true);
-                ProgressBar.Value = 0;
-                ProgressLabel.Text = "";
-                StepLabel.Text = "";
-                ProgressTextBox.SelectionColor = ProgressTextBox.ForeColor;
+                DownloadIsRunning(true);
+                ResetFileNames();
+                cts.Dispose();
+                cts = null;
+                if (ProgressBar != null && !ProgressBar.IsDisposed)
+                {
+                    ProgressBar.Value = 0;
+                    ProgressLabel.Text = "";
+                    ProgressTextBox.SelectionColor = ProgressTextBox.ForeColor;
+                }
+                if (StepLabel != null && !StepLabel.IsDisposed)
+                    StepLabel.Text = "";
             }
         }
 
-        private async void DownloadAudioAsMP3()
+        private async Task DownloadAudioAsMP3(CancellationToken cancellationToken)
         {
             try
             {
@@ -151,21 +176,22 @@ namespace YoutubeDownloader
                 if (audioStreamInfo != null)
                 {
                     string sanitizedTitle = SanitizeFileName(video.Title);
-                    string audioFileName = $"{downloadPath}\\{sanitizedTitle}.webm";
+                    audioFileName = $"{downloadPath}\\{sanitizedTitle}.webm";
 
                     Progress<double> progressHandler = new Progress<double>(percent => ProgressBar.Value = (int)(percent * 100));
 
                     ProgressLabel.Text = "Downloading Audio ...";
                     StepLabel.Text = "Step 1 of 2";
 
-                    await youtube.Videos.Streams.DownloadAsync(audioStreamInfo, audioFileName, progressHandler);
+                    cancellationToken.ThrowIfCancellationRequested();
+                    await youtube.Videos.Streams.DownloadAsync(audioStreamInfo, audioFileName, progressHandler, cancellationToken);
 
                     ProgressLabel.Text = "Converting into mp3 ...";
                     StepLabel.Text = "Step 2 of 2";
 
                     string mergedFileNameOriginal = $"{downloadPath}\\{sanitizedTitle}.mp3";
-                    string mergedFileName = GetUniqueFileName(mergedFileNameOriginal);
-                    await ConvertIntoMP3(audioFileName, mergedFileName);
+                    mergedFileName = GetUniqueFileName(mergedFileNameOriginal);
+                    await ConvertIntoMP3(audioFileName, mergedFileName, cancellationToken);
                     File.Delete(audioFileName);
 
                     if (!ffmpegError)
@@ -177,9 +203,13 @@ namespace YoutubeDownloader
                     }
                     else
                     {
-                        ProgressTextBox.Clear();
-                        ProgressTextBox.SelectionColor = Color.Red;
-                        ProgressTextBox.AppendText("Download failed!");
+                        if (ProgressTextBox != null && !ProgressTextBox.IsDisposed)
+                        {
+                            ProgressTextBox.Clear();
+                            ProgressTextBox.SelectionColor = Color.Red;
+                            ProgressTextBox.AppendText("Download failed!");
+                        }
+                        CleanUpFiles();
                     }
                 }
                 else
@@ -188,19 +218,51 @@ namespace YoutubeDownloader
                     ProgressTextBox.Clear();
                     ProgressTextBox.SelectionColor = Color.Red;
                     ProgressTextBox.AppendText("Download failed!");
+                    CleanUpFiles();
                 }
             }
             catch (Exception ex)
             {
-                HandleExeption(ex);
+                HandleException(ex);
             }
             finally
             {
-                EnableButtons(true);
-                ProgressBar.Value = 0;
-                ProgressLabel.Text = "";
-                StepLabel.Text = "";
-                ProgressTextBox.SelectionColor = ProgressTextBox.ForeColor;
+                DownloadIsRunning(true);
+                ResetFileNames();
+                cts.Dispose();
+                cts = null;
+                if (ProgressBar != null && !ProgressBar.IsDisposed)
+                {
+                    ProgressBar.Value = 0;
+                    ProgressLabel.Text = "";
+                    ProgressTextBox.SelectionColor = ProgressTextBox.ForeColor;
+                }
+                if (StepLabel != null && !StepLabel.IsDisposed)
+                    StepLabel.Text = "";
+            }
+        }
+
+        private async void CancelDownload()
+        {
+            if (downloadIsRunning)
+            {
+                DialogResult result = MessageBox.Show("Are you sure you want to cancel the download?", "Warning", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+
+                if (result == DialogResult.Cancel || cts == null)
+                {
+                    return;
+                }
+
+                try
+                {
+                    cts?.Cancel();
+                    if (downloadTask != null)
+                        await downloadTask;
+                } 
+                catch (Exception ex)
+                {
+                    HandleException(ex);
+                }
             }
         }
     }

@@ -9,25 +9,30 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using YoutubeExplode.Videos.Streams;
 
 namespace YoutubeDownloader
 {
+
     public partial class Form1
     {
         // HELPING METHODS //
 
-        private void EnableButtons(bool enabled)
+        private void DownloadIsRunning(bool isRunning)
         {
-            ConvertButton.Enabled = enabled;
-            ChooseButton.Enabled = enabled;
-            ResetButton.Enabled = enabled;
-            FormatBox.Enabled = enabled;
+            downloadIsRunning = !isRunning;
+            ChooseButton.Enabled = isRunning;
+            ResetButton.Enabled = isRunning;
+            FormatBox.Enabled = isRunning;
+            ConvertButton.Text = isRunning ? "Start Download" : "Stop Download";
 
-            if (FormatBox.SelectedIndex == 0)
+            if ((FormatBox.SelectedIndex == (int)DownloadFormat.mp4) ||
+                (FormatBox.SelectedIndex == (int)DownloadFormat.mkv))
             {
-                QualitySettings.Enabled = enabled;
+                QualitySettings.Enabled = isRunning;
             }
         }
 
@@ -61,8 +66,7 @@ namespace YoutubeDownloader
         {
             foreach (Control control in groupBox.Controls)
             {
-                RadioButton radio = control as RadioButton;
-                if (radio != null && radio.Checked)
+                if (control is RadioButton radio && radio.Checked)
                 {
                     return radio;
                 }
@@ -72,7 +76,7 @@ namespace YoutubeDownloader
             return null;
         }
 
-        private void HandleExeption(Exception ex)
+        private void HandleException(Exception ex)
         {
             switch (ex)
             {
@@ -122,13 +126,51 @@ namespace YoutubeDownloader
                     ProgressTextBox.SelectionColor = Color.Red;
                     ProgressTextBox.AppendText("Download failed!");
                     break;
+                case TaskCanceledException _:
+                    CleanUpFiles();
+                    if (ProgressTextBox != null && !ProgressTextBox.IsDisposed)
+                    {
+                        ProgressTextBox.Clear();
+                        ProgressTextBox.SelectionColor = Color.Red;
+                        ProgressTextBox.AppendText("Download failed!");
+                    }
+                    break;
+                case OperationCanceledException _:
+                    CleanUpFiles();
+                    if (ProgressTextBox != null && !ProgressTextBox.IsDisposed)
+                    {
+                        ProgressTextBox.Clear();
+                        ProgressTextBox.SelectionColor = Color.Red;
+                        ProgressTextBox.AppendText("Download failed!");
+                    }
+                    break;
                 case Exception _:
                     _ = MessageBox.Show("An unexpected error occurred: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    ProgressTextBox.Clear();
-                    ProgressTextBox.SelectionColor = Color.Red;
-                    ProgressTextBox.AppendText("Download failed!");
+                    if (ProgressTextBox != null && !ProgressTextBox.IsDisposed)
+                    {
+                        ProgressTextBox.Clear();
+                        ProgressTextBox.SelectionColor = Color.Red;
+                        ProgressTextBox.AppendText("Download failed!");
+                    }
                     break;
             }
+        }
+
+        private void CleanUpFiles()
+        {
+            if (File.Exists(videoFileName))
+                File.Delete(videoFileName);
+            if (File.Exists(audioFileName))
+                File.Delete(audioFileName);
+            if (File.Exists(mergedFileName))
+                File.Delete(mergedFileName);
+        }
+
+        private void ResetFileNames()
+        {
+            videoFileName = null;
+            audioFileName = null;
+            mergedFileName = null;
         }
     }
 } 

@@ -104,6 +104,9 @@
     <Compile Include="HelpingMethods.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Processes.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">

@@ -9,6 +9,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -18,9 +19,14 @@ namespace YoutubeDownloader
     {
         // FFMPEG METHODS //
 
-        private async Task MergeVideoAndAudio(string videoPath, string audioPath, string outputPath)
+        private async Task MergeVideoAndAudio(string videoPath, string audioPath, string outputPath, string format, CancellationToken cancellationToken)
         {
             // merges audio and video together by using ffmpeg.exe
+            if (format != "mp4" && format != "mkv")
+            {
+                _ = MessageBox.Show("Failed to merge: Unkown video format!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
             if (!File.Exists(ffmpegPath))
             {
@@ -29,17 +35,23 @@ namespace YoutubeDownloader
                 return;
             }
 
-            ProcessStartInfo startInfo = new ProcessStartInfo
+            ProcessStartInfo startInfo = null;
+            switch (format)
             {
-                FileName = ffmpegPath,
-                Arguments = $"-i \"{videoPath}\" -i \"{audioPath}\" -c:v copy -c:a aac \"{outputPath}\"",
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                CreateNoWindow = true
-            };
+                case "mp4":
+                    startInfo = ProcessMP4(videoPath, audioPath, outputPath);
+                    break;
+                case "mkv":
+                    startInfo = ProcessMKV(videoPath, audioPath, outputPath);
+                    break;
+                default:
+                    _ = MessageBox.Show("Failed to Start Process", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+            }
+
             try
             {
+                bool wasKilledByCancellationToken = false;
                 using (Process process = new Process { StartInfo = startInfo })
                 {
                     process.ErrorDataReceived += (sender, e) =>
@@ -65,13 +77,26 @@ namespace YoutubeDownloader
                         }
                     };
 
+                    _ = cancellationToken.Register(() =>
+                    {
+                        if (!process.HasExited)
+                        {
+                            process.Kill();
+                            wasKilledByCancellationToken = true;
+                        }
+                    });
+
                     _ = process.Start();
                     process.BeginErrorReadLine();
+
+                    cancellationToken.ThrowIfCancellationRequested();
                     await Task.Run(() => process.WaitForExit());
 
                     if (process.ExitCode != 0)
                     {
-                        _ = MessageBox.Show("There was an error while merging the video and audio.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        if (!wasKilledByCancellationToken)
+                            _ = MessageBox.Show("There was an error while merging the video and audio.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
                         ffmpegError = true;
                         return;
                     }
@@ -84,7 +109,7 @@ namespace YoutubeDownloader
             }
         }
 
-        private async Task ConvertIntoMP3(string webmPath, string outputPath)
+        private async Task ConvertIntoMP3(string webmPath, string outputPath, CancellationToken cancellationToken)
         {
             // Converts .webm to .mp3 using ffmpeg.exe
 
@@ -106,6 +131,7 @@ namespace YoutubeDownloader
             };
             try
             {
+                bool wasKilledByCancellationToken = false;
                 using (Process process = new Process { StartInfo = startInfo })
                 {
                     process.ErrorDataReceived += (sender, e) =>
@@ -131,13 +157,26 @@ namespace YoutubeDownloader
                         }
                     };
 
+                    _ = cancellationToken.Register(() =>
+                    {
+                        if (!process.HasExited)
+                        {
+                            process.Kill();
+                            wasKilledByCancellationToken = true;
+                        }
+                    });
+
                     _ = process.Start();
                     process.BeginErrorReadLine();
+
+                    cancellationToken.ThrowIfCancellationRequested();
                     await Task.Run(() => process.WaitForExit());
 
                     if (process.ExitCode != 0)
                     {
-                        _ = MessageBox.Show("There was an error while converting the .webm to .mp3.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        if (!wasKilledByCancellationToken)
+                            _ = MessageBox.Show("There was an error while converting the .webm to .mp3.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
                         ffmpegError = true;
                         return;
                     }
