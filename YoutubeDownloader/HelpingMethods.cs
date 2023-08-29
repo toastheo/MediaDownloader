@@ -73,6 +73,7 @@ namespace YoutubeDownloader
             }
         }
 
+        // giving al UI Elements the correct Font
         private void InitFonts()
         {
             if (fontStream == null)

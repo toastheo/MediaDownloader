@@ -139,7 +139,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Montserrat-VariableFont_wght.ttf" />
+    <EmbeddedResource Include="Resources\Montserrat-VariableFont_wght.ttf" />
     <None Include="Resources\YoutubeConverterIcon.png" />
   </ItemGroup>
   <ItemGroup>

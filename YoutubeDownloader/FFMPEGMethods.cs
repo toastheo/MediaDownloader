@@ -36,6 +36,7 @@ namespace YoutubeDownloader
                 return;
             }
 
+            // get the procressInformation for using ffmpeg
             ProcessStartInfo startInfo = null;
             switch (format)
             {
@@ -58,10 +59,10 @@ namespace YoutubeDownloader
 
             try
             {
-                bool wasKilledByCancellationToken = false;
+                bool wasKilledByCancellationToken = false;      // display no error message if user requested cancellation
                 using (Process process = new Process { StartInfo = startInfo })
                 {
-                    string errorMessage = null;
+                    string errorMessage = null;         // to store the errormessage
                     process.ErrorDataReceived += (sender, e) =>
                     {
                         if (e.Data != null)
@@ -136,6 +137,7 @@ namespace YoutubeDownloader
                 return;
             }
 
+            // get the procressInformation for using ffmpeg
             ProcessStartInfo startInfo;
             switch (format)
             {
@@ -164,10 +166,12 @@ namespace YoutubeDownloader
                 bool wasKilledByCancellationToken = false;
                 using (Process process = new Process { StartInfo = startInfo })
                 {
+                    string errorMessage = null;
                     process.ErrorDataReceived += (sender, e) =>
                     {
                         if (e.Data != null)
                         {
+                            errorMessage = e.Data;         // to store the errormessage
                             Match match = Regex.Match(e.Data, @"time=(\d+:\d+:\d+.\d+)");
                             if (match.Success)
                             {
@@ -205,7 +209,7 @@ namespace YoutubeDownloader
                     if (process.ExitCode != 0)
                     {
                         if (!wasKilledByCancellationToken)
-                            _ = MessageBox.Show($"There was an error while converting the .webm to {format}.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            _ = MessageBox.Show($"There was an error while converting the .webm to {format}: {errorMessage}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                         ffmpegError = true;
                         return;

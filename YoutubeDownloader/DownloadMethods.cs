@@ -61,6 +61,7 @@ namespace YoutubeDownloader
                         throw new StreamNotAvaibleException("webm");
                 }
 
+                // check which quality user requested
                 switch (selectedRadio.Name)
                 {
                     case "ButtonMax":
@@ -109,6 +110,7 @@ namespace YoutubeDownloader
                         audioStreamInfo = (IAudioStreamInfo)aacStreams.GetWithHighestBitrate();
                 }
 
+                // if requested audio is not available
                 if (audioStreamInfo == null)
                 {
                     audioStreamInfo = (IAudioStreamInfo)streamManifest.GetAudioOnlyStreams().GetWithHighestBitrate();
@@ -116,19 +118,24 @@ namespace YoutubeDownloader
 
                 if (videoStreamInfo != null && audioStreamInfo != null)
                 {
+                    // create video and audio file
                     string sanitizedTitle = SanitizeFileName(video.Title);
                     videoFileName = $"{downloadPath}\\{sanitizedTitle}_video.{videoStreamInfo.Container}";
                     audioFileName = $"{downloadPath}\\{sanitizedTitle}_audio.{audioStreamInfo.Container}";
 
                     Progress<double> progressHandler = new Progress<double>(percent => ProgressBar.Value = (int)(percent * 100));
 
+                    // try to download the video
                     ProgressLabel.Text = "Downloading Video ...";
                     StepLabel.Text = "Step 1 of 3";
+
                     cancellationToken.ThrowIfCancellationRequested();
                     await youtube.Videos.Streams.DownloadAsync(videoStreamInfo, videoFileName, progressHandler, cancellationToken);
 
+                    // try to download the audio
                     ProgressLabel.Text = "Downloading Audio ...";
                     StepLabel.Text = "Step 2 of 3";
+
                     cancellationToken.ThrowIfCancellationRequested();
                     await youtube.Videos.Streams.DownloadAsync(audioStreamInfo, audioFileName, progressHandler, cancellationToken);
 
@@ -139,6 +146,8 @@ namespace YoutubeDownloader
                     string mergedFileNameOriginal = $"{downloadPath}\\{sanitizedTitle}.{format}";
                     mergedFileName = GetUniqueFileName(mergedFileNameOriginal);
                     await MergeVideoAndAudio(videoFileName, audioFileName, mergedFileName, format, cancellationToken);
+
+                    // delete the temporary files
                     File.Delete(videoFileName);
                     File.Delete(audioFileName);
 
@@ -177,8 +186,12 @@ namespace YoutubeDownloader
             {
                 DownloadIsRunning(true);
                 ResetFileNames();
+
+                // dipose cancelToken
                 cts.Dispose();
                 cts = null;
+
+                // reset progressbar and steplabel
                 if (ProgressBar != null && !ProgressBar.IsDisposed)
                 {
                     ProgressBar.Value = 0;
@@ -205,23 +218,28 @@ namespace YoutubeDownloader
 
                 if (audioStreamInfo != null)
                 {
+                    // create audioFile
                     string sanitizedTitle = SanitizeFileName(video.Title);
                     audioFileName = $"{downloadPath}\\{sanitizedTitle}.webm";
 
                     Progress<double> progressHandler = new Progress<double>(percent => ProgressBar.Value = (int)(percent * 100));
 
+                    // try to download the audio
                     ProgressLabel.Text = "Downloading Audio ...";
                     StepLabel.Text = "Step 1 of 2";
 
                     cancellationToken.ThrowIfCancellationRequested();
                     await youtube.Videos.Streams.DownloadAsync(audioStreamInfo, audioFileName, progressHandler, cancellationToken);
 
+                    // converting into the requested format
                     ProgressLabel.Text = $"Converting into {format} ...";
                     StepLabel.Text = "Step 2 of 2";
 
                     string mergedFileNameOriginal = $"{downloadPath}\\{sanitizedTitle}.{format}";
                     mergedFileName = GetUniqueFileName(mergedFileNameOriginal);
                     await ConvertIntoAudio(audioFileName, mergedFileName, format, cancellationToken);
+
+                    // delete temporary file
                     File.Delete(audioFileName);
 
                     if (!ffmpegError)
@@ -259,8 +277,12 @@ namespace YoutubeDownloader
             {
                 DownloadIsRunning(true);
                 ResetFileNames();
+
+                // dipose cancelToken
                 cts.Dispose();
                 cts = null;
+
+                // reset ProgressBar and Steplabel
                 if (ProgressBar != null && !ProgressBar.IsDisposed)
                 {
                     ProgressBar.Value = 0;

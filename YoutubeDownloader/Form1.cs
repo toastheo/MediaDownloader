@@ -39,6 +39,7 @@ namespace YoutubeDownloader
         private bool reEncodeAudio = false;
         private bool reEncodeVideo = false;
 
+        // download formats have to be in the same order like in the FormatBox
         private enum DownloadFormat
         {
             mp4,
