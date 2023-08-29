@@ -22,9 +22,10 @@ namespace YoutubeDownloader
         private async Task MergeVideoAndAudio(string videoPath, string audioPath, string outputPath, string format, CancellationToken cancellationToken)
         {
             // merges audio and video together by using ffmpeg.exe
-            if (format != "mp4" && format != "mkv")
+            if (format != "mp4" && format != "mkv" && format != "webm" && format != "flv")
             {
-                _ = MessageBox.Show("Failed to merge: Unkown video format!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                _ = MessageBox.Show($"Failed to merge: Unkown video format {format}!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ffmpegError = true;
                 return;
             }
 
@@ -39,10 +40,16 @@ namespace YoutubeDownloader
             switch (format)
             {
                 case "mp4":
-                    startInfo = ProcessMP4(videoPath, audioPath, outputPath);
+                    startInfo = ProcessMP4(videoPath, audioPath, outputPath, reEncodeVideo, reEncodeAudio);
                     break;
                 case "mkv":
-                    startInfo = ProcessMKV(videoPath, audioPath, outputPath);
+                    startInfo = ProcessMKV(videoPath, audioPath, outputPath, reEncodeVideo, reEncodeAudio);
+                    break;
+                case "webm":
+                    startInfo = ProcessWEBM(videoPath, audioPath, outputPath, reEncodeVideo, reEncodeAudio);
+                    break;
+                case "flv":
+                    startInfo = ProcessFLV(videoPath, audioPath, outputPath, reEncodeVideo, reEncodeAudio);
                     break;
                 default:
                     _ = MessageBox.Show("Failed to Start Process", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -54,10 +61,12 @@ namespace YoutubeDownloader
                 bool wasKilledByCancellationToken = false;
                 using (Process process = new Process { StartInfo = startInfo })
                 {
+                    string errorMessage = null;
                     process.ErrorDataReceived += (sender, e) =>
                     {
                         if (e.Data != null)
                         {
+                            errorMessage = e.Data;
                             Match match = Regex.Match(e.Data, @"time=(\d+:\d+:\d+.\d+)");
                             if (match.Success)
                             {
@@ -95,7 +104,7 @@ namespace YoutubeDownloader
                     if (process.ExitCode != 0)
                     {
                         if (!wasKilledByCancellationToken)
-                            _ = MessageBox.Show("There was an error while merging the video and audio.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            _ = MessageBox.Show($"There was an error while merging the video and audio: {errorMessage}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                         ffmpegError = true;
                         return;
@@ -109,9 +118,16 @@ namespace YoutubeDownloader
             }
         }
 
-        private async Task ConvertIntoMP3(string webmPath, string outputPath, CancellationToken cancellationToken)
+        private async Task ConvertIntoAudio(string webmPath, string outputPath, string format, CancellationToken cancellationToken)
         {
-            // Converts .webm to .mp3 using ffmpeg.exe
+            // Converts .webm to the given audioformat using ffmpeg.exe
+
+            if (format != "mp3" && format != "wav" && format != "oga" && format != "m4a" && format != "aac")
+            {
+                _ = MessageBox.Show($"Failed to convert into {format}: Unkown audio format!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ffmpegError = true;
+                return;
+            }
 
             if (!File.Exists(ffmpegPath))
             {
@@ -120,15 +136,29 @@ namespace YoutubeDownloader
                 return;
             }
 
-            ProcessStartInfo startInfo = new ProcessStartInfo
+            ProcessStartInfo startInfo;
+            switch (format)
             {
-                FileName = ffmpegPath,
-                Arguments = $"-i \"{webmPath}\" -b:a 192K -vn \"{outputPath}\"",
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                CreateNoWindow = true
-            };
+                case "mp3":
+                    startInfo = ProcessMP3(webmPath, outputPath);
+                    break;
+                case "wav":
+                    startInfo = ProcessWAV(webmPath, outputPath);
+                    break;
+                case "oga":
+                    startInfo = ProcessOGG(webmPath, outputPath);
+                    break;
+                case "m4a":
+                    startInfo = ProcessM4A(webmPath, outputPath);
+                    break;
+                case "aac":
+                    startInfo = ProcessAAC(webmPath, outputPath);
+                    break;
+                default:
+                    _ = MessageBox.Show("Failed to Start Process", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+            }
+             
             try
             {
                 bool wasKilledByCancellationToken = false;
@@ -175,7 +205,7 @@ namespace YoutubeDownloader
                     if (process.ExitCode != 0)
                     {
                         if (!wasKilledByCancellationToken)
-                            _ = MessageBox.Show("There was an error while converting the .webm to .mp3.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            _ = MessageBox.Show($"There was an error while converting the .webm to {format}.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                         ffmpegError = true;
                         return;

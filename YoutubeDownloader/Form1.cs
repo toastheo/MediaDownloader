@@ -15,35 +15,49 @@ using System.Windows.Forms;
 using System.Threading;
 using System.Globalization;
 using YoutubeExplode;
-
+using System.Drawing.Text;
 
 namespace YoutubeDownloader
 {
     public partial class Form1 : Form
     {
+        private PrivateFontCollection privateFonts = new PrivateFontCollection();
+
         private YoutubeClient youtube;
         private TimeSpan videoDuration;
         private string downloadPath;
         private bool downloadIsRunning = false;
         private string url;
 
-        private string ffmpegPath;
+        private readonly string ffmpegPath;
         private bool ffmpegError;
 
         private CancellationTokenSource cts;
         private Task downloadTask = null;
         private SynchronizationContext _uiContext;
 
+        private bool reEncodeAudio = false;
+        private bool reEncodeVideo = false;
+
         private enum DownloadFormat
         {
             mp4,
             mkv,
+            webm,
+            flv,
             mp3,
+            wav,
+            oga,
+            m4a,
+            aac
         };
 
         public Form1()
         {
+
             InitializeComponent();
+            LoadFontFromRessources();
+            InitFonts();
             Load += Form1_Load;
 
             youtube = new YoutubeClient();
@@ -83,9 +97,16 @@ namespace YoutubeDownloader
 
         private async void ConvertButton_Click(object sender, EventArgs e)
         {
+
             if (downloadIsRunning)
             {
                 CancelDownload();
+                return;
+            }
+
+            url = InputBox.Text;
+            if (string.IsNullOrWhiteSpace(url))
+            {
                 return;
             }
 
@@ -93,14 +114,6 @@ namespace YoutubeDownloader
 
             // disable all Buttons while downloading
             DownloadIsRunning(false);
-            url = textBox1.Text;
-
-            if (string.IsNullOrWhiteSpace(url))
-            {
-                DownloadIsRunning(true);
-                return;
-            }
-
             ffmpegError = false;
 
             switch (FormatBox.SelectedIndex)
@@ -113,19 +126,53 @@ namespace YoutubeDownloader
                     downloadTask = DownloadVideoAs("mkv", cts.Token);
                     await downloadTask;
                     break;
-                case (int)DownloadFormat.mp3:
-                    downloadTask = DownloadAudioAsMP3(cts.Token);
+                case (int)DownloadFormat.webm:
+                    downloadTask = DownloadVideoAs("webm", cts.Token);
                     await downloadTask;
+                    break;
+                case (int)DownloadFormat.flv:
+                    downloadTask = DownloadVideoAs("flv", cts.Token);
+                    await downloadTask;
+                    break;
+                case (int)DownloadFormat.mp3:
+                    downloadTask = DownloadAudioAs("mp3", cts.Token);
+                    await downloadTask;
+                    break;
+                case (int)DownloadFormat.wav:
+                    downloadTask = DownloadAudioAs("wav", cts.Token);
+                    await downloadTask;
+                    break;
+                case (int)DownloadFormat.oga:
+                    downloadTask = DownloadAudioAs("oga", cts.Token);
+                    break;
+                case (int)DownloadFormat.m4a:
+                    downloadTask = DownloadAudioAs("m4a", cts.Token);
+                    break;
+                case (int)DownloadFormat.aac:
+                    downloadTask = DownloadAudioAs("aac", cts.Token);
                     break;
             }
 
             downloadTask = null;
         }
 
+        // Disable unimportant settings if you user choose an audio format
         private void FormatBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            QualitySettings.Enabled = (FormatBox.SelectedIndex == (int)DownloadFormat.mp4) ||
-                                      (FormatBox.SelectedIndex == (int)DownloadFormat.mkv);
+            List<int> enabledFormats = new List<int>
+            {
+                (int)DownloadFormat.mp4,
+                (int)DownloadFormat.mkv,
+                (int)DownloadFormat.webm,
+                (int)DownloadFormat.flv
+            };
+
+            bool isEnabled = enabledFormats.Contains(FormatBox.SelectedIndex);
+
+            QualitySettings.Enabled = isEnabled;
+            ReencodeVideoCheck.Enabled = isEnabled;
+            ReencodeAudioCheck.Enabled = isEnabled;
+            ASettingsLabel.Enabled = isEnabled;
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)

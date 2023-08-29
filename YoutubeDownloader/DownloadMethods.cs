@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -26,7 +27,7 @@ namespace YoutubeDownloader
 
         private async Task DownloadVideoAs(string format, CancellationToken cancellationToken)
         {
-            if (format != "mp4" && format != "mkv")
+            if (format != "mp4" && format != "mkv" && format != "webm" && format != "flv")
             {
                 _ = MessageBox.Show("Unkown video format!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
@@ -49,40 +50,69 @@ namespace YoutubeDownloader
                 }
 
                 // get video in required quality
+                IEnumerable<VideoOnlyStreamInfo> streams = streamManifest.GetVideoOnlyStreams();
                 IVideoStreamInfo videoStreamInfo = null;
+
+                // filter by vp9 if webm is requested
+                if (format == "webm")
+                {
+                    streams = streamManifest.GetVideoOnlyStreams().Where(s => s.VideoCodec.Contains("vp9"));
+                    if (!streams.Any())
+                        throw new StreamNotAvaibleException("webm");
+                }
+
                 switch (selectedRadio.Name)
                 {
                     case "ButtonMax":
-                        videoStreamInfo = streamManifest.GetVideoOnlyStreams().GetWithHighestVideoQuality();
+                        videoStreamInfo = streams.GetWithHighestVideoQuality();
                         break;
                     case "Button4K":
-                        videoStreamInfo = streamManifest.GetVideoOnlyStreams().FirstOrDefault(s => s.VideoResolution.Height == 2160);
+                        videoStreamInfo = streams.FirstOrDefault(s => s.VideoResolution.Height == 2160);
                         break;
                     case "Button1440p":
-                        videoStreamInfo = streamManifest.GetVideoOnlyStreams().FirstOrDefault(s => s.VideoResolution.Height == 1440);
+                        videoStreamInfo = streams.FirstOrDefault(s => s.VideoResolution.Height == 1440);
                         break;
                     case "Button1080p":
-                        videoStreamInfo = streamManifest.GetVideoOnlyStreams().FirstOrDefault(s => s.VideoResolution.Height == 1080);
+                        videoStreamInfo = streams.FirstOrDefault(s => s.VideoResolution.Height == 1080);
                         break;
                     case "Button720p":
-                        videoStreamInfo = streamManifest.GetVideoOnlyStreams().FirstOrDefault(s => s.VideoResolution.Height == 720);
+                        videoStreamInfo = streams.FirstOrDefault(s => s.VideoResolution.Height == 720);
                         break;
                     case "Button480p":
-                        videoStreamInfo = streamManifest.GetVideoOnlyStreams().FirstOrDefault(s => s.VideoResolution.Height == 480);
+                        videoStreamInfo = streams.FirstOrDefault(s => s.VideoResolution.Height == 480);
                         break;
                     case "Button360p":
-                        videoStreamInfo = streamManifest.GetVideoOnlyStreams().FirstOrDefault(s => s.VideoResolution.Height == 360);
+                        videoStreamInfo = streams.FirstOrDefault(s => s.VideoResolution.Height == 360);
                         break;
                 }
 
                 // if requested quality is not available
                 if (videoStreamInfo == null)
                 {
-                    videoStreamInfo = streamManifest.GetVideoOnlyStreams().GetWithHighestVideoQuality();
+                    videoStreamInfo = streams.GetWithHighestVideoQuality();
                 }
 
                 // get audio
-                IAudioStreamInfo audioStreamInfo = (IAudioStreamInfo)streamManifest.GetAudioOnlyStreams().GetWithHighestBitrate();
+                IAudioStreamInfo audioStreamInfo = null;
+                if (format == "webm")
+                {
+                    IEnumerable<AudioOnlyStreamInfo> opusStreams = streamManifest.GetAudioOnlyStreams().Where(a => a.AudioCodec.Contains("opus"));
+
+                    if (opusStreams.Any())
+                        audioStreamInfo = (IAudioStreamInfo)opusStreams.GetWithHighestBitrate();
+                }
+                else
+                {
+                    IEnumerable<AudioOnlyStreamInfo> aacStreams = streamManifest.GetAudioOnlyStreams().Where(a => a.AudioCodec.Contains("aac"));
+
+                    if (aacStreams.Any())
+                        audioStreamInfo = (IAudioStreamInfo)aacStreams.GetWithHighestBitrate();
+                }
+
+                if (audioStreamInfo == null)
+                {
+                    audioStreamInfo = (IAudioStreamInfo)streamManifest.GetAudioOnlyStreams().GetWithHighestBitrate();
+                }
 
                 if (videoStreamInfo != null && audioStreamInfo != null)
                 {
@@ -103,7 +133,7 @@ namespace YoutubeDownloader
                     await youtube.Videos.Streams.DownloadAsync(audioStreamInfo, audioFileName, progressHandler, cancellationToken);
 
                     // merge files together
-                    ProgressLabel.Text = "Merging files together ...";
+                    ProgressLabel.Text = $"Merging files to {format} ...";
                     StepLabel.Text = "Step 3 of 3";
 
                     string mergedFileNameOriginal = $"{downloadPath}\\{sanitizedTitle}.{format}";
@@ -160,7 +190,7 @@ namespace YoutubeDownloader
             }
         }
 
-        private async Task DownloadAudioAsMP3(CancellationToken cancellationToken)
+        private async Task DownloadAudioAs(string format, CancellationToken cancellationToken)
         {
             try
             {
@@ -186,12 +216,12 @@ namespace YoutubeDownloader
                     cancellationToken.ThrowIfCancellationRequested();
                     await youtube.Videos.Streams.DownloadAsync(audioStreamInfo, audioFileName, progressHandler, cancellationToken);
 
-                    ProgressLabel.Text = "Converting into mp3 ...";
+                    ProgressLabel.Text = $"Converting into {format} ...";
                     StepLabel.Text = "Step 2 of 2";
 
-                    string mergedFileNameOriginal = $"{downloadPath}\\{sanitizedTitle}.mp3";
+                    string mergedFileNameOriginal = $"{downloadPath}\\{sanitizedTitle}.{format}";
                     mergedFileName = GetUniqueFileName(mergedFileNameOriginal);
-                    await ConvertIntoMP3(audioFileName, mergedFileName, cancellationToken);
+                    await ConvertIntoAudio(audioFileName, mergedFileName, format, cancellationToken);
                     File.Delete(audioFileName);
 
                     if (!ffmpegError)

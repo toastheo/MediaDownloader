@@ -92,6 +92,7 @@
     <Compile Include="DownloadMethods.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Exceptions.cs" />
     <Compile Include="FFMPEGMethods.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -122,6 +123,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="Montserrat-VariableFont_wght.ttf" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -137,6 +139,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\Montserrat-VariableFont_wght.ttf" />
     <None Include="Resources\YoutubeConverterIcon.png" />
   </ItemGroup>
   <ItemGroup>
