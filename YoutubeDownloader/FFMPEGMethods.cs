@@ -74,14 +74,21 @@ namespace YoutubeDownloader
                                 TimeSpan currentTime = TimeSpan.Parse(match.Groups[1].Value);
                                 double percentage = currentTime.TotalSeconds / videoDuration.TotalSeconds * 100;
 
+                                // check if percentage is out of range
+                                if (percentage > 100) percentage = 100;
+                                if (percentage < 0) percentage = 0;
+
                                 // update ProgressBar from the main UI thread
-                                if (ProgressBar.InvokeRequired)
+                                if (!ProgressBar.IsDisposed && ProgressBar != null)
                                 {
-                                    ProgressBar.Invoke(new Action(() => ProgressBar.Value = (int)percentage));
-                                }
-                                else
-                                {
-                                    ProgressBar.Value = (int)percentage;
+                                    if (ProgressBar.InvokeRequired)
+                                    {
+                                        ProgressBar.Invoke(new Action(() => ProgressBar.Value = (int)percentage));
+                                    }
+                                    else
+                                    {
+                                        ProgressBar.Value = (int)percentage;
+                                    }
                                 }
                             }
                         }
@@ -179,13 +186,17 @@ namespace YoutubeDownloader
                                 double percentage = currentTime.TotalSeconds / videoDuration.TotalSeconds * 100;
 
                                 // update ProgressBar from the main UI thread
-                                if (ProgressBar.InvokeRequired)
+
+                                if (!ProgressBar.IsDisposed && ProgressBar != null)
                                 {
-                                    ProgressBar.Invoke(new Action(() => ProgressBar.Value = (int)percentage));
-                                }
-                                else
-                                {
-                                    ProgressBar.Value = (int)percentage;
+                                    if (ProgressBar.InvokeRequired)
+                                    {
+                                        ProgressBar.Invoke(new Action(() => ProgressBar.Value = (int)percentage));
+                                    }
+                                    else
+                                    {
+                                        ProgressBar.Value = (int)percentage;
+                                    }
                                 }
                             }
                         }
