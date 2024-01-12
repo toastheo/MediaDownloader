@@ -63,11 +63,27 @@ namespace YoutubeDownloader
                 using (Process process = new Process { StartInfo = startInfo })
                 {
                     string errorMessage = null;         // to store the errormessage
+
                     process.ErrorDataReceived += (sender, e) =>
                     {
                         if (e.Data != null)
                         {
                             errorMessage = e.Data;
+
+                            // display full information if advanced informations requested
+                            if (AdvancedInformationsCheck.Checked && AdvancedInformationsTextBox != null && !AdvancedInformationsTextBox.IsDisposed)
+                            {
+                                if (AdvancedInformationsTextBox.InvokeRequired)
+                                {
+                                    AdvancedInformationsTextBox.Invoke(new Action(() => 
+                                        AdvancedInformationsTextBox.Text = videoInformation + "FFMPEG: " + Environment.NewLine + errorMessage));
+                                }
+                                else
+                                {
+                                    AdvancedInformationsTextBox.Text = videoInformation + "FFMPEG: " + Environment.NewLine + errorMessage;
+                                }
+                            }
+
                             Match match = Regex.Match(e.Data, @"time=(\d+:\d+:\d+.\d+)");
                             if (match.Success)
                             {
@@ -105,6 +121,7 @@ namespace YoutubeDownloader
 
                     _ = process.Start();
                     process.BeginErrorReadLine();
+                    process.BeginOutputReadLine();
 
                     cancellationToken.ThrowIfCancellationRequested();
                     await Task.Run(() => process.WaitForExit());
@@ -179,7 +196,22 @@ namespace YoutubeDownloader
                         if (e.Data != null)
                         {
                             errorMessage = e.Data;         // to store the errormessage
-                            Match match = Regex.Match(e.Data, @"time=(\d+:\d+:\d+.\d+)");
+
+                            // display full information if advanced informations requested
+                            if (AdvancedInformationsCheck.Checked && AdvancedInformationsTextBox != null && !AdvancedInformationsTextBox.IsDisposed)
+                            {
+                                if (AdvancedInformationsTextBox.InvokeRequired)
+                                {
+                                    AdvancedInformationsTextBox.Invoke(new Action(() =>
+                                        AdvancedInformationsTextBox.Text = videoInformation + "FFMPEG: " + Environment.NewLine + errorMessage));
+                                }
+                                else
+                                {
+                                    AdvancedInformationsTextBox.Text = videoInformation + "FFMPEG: " + Environment.NewLine + errorMessage;
+                                }
+                            }
+
+                                Match match = Regex.Match(e.Data, @"time=(\d+:\d+:\d+.\d+)");
                             if (match.Success)
                             {
                                 TimeSpan currentTime = TimeSpan.Parse(match.Groups[1].Value);

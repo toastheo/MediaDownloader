@@ -15,6 +15,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using YoutubeExplode.Videos;
 using YoutubeExplode.Videos.Streams;
 
 namespace YoutubeDownloader
@@ -95,6 +96,8 @@ namespace YoutubeDownloader
             ASettingsLabel.Font = new Font(privateFonts.Families[0], 8);
             ReencodeVideoCheck.Font = new Font(privateFonts.Families[0], 8);
             ReencodeAudioCheck.Font = new Font(privateFonts.Families[0], 8);
+            AdvancedInformationsCheck.Font = new Font(privateFonts.Families[0], 8);
+            AdvancedInformationsTextBox.Font = new Font(privateFonts.Families[0], 10);
         }
 
         private static string SanitizeFileName(string fileName)
@@ -135,6 +138,26 @@ namespace YoutubeDownloader
 
             // no radioButton selected
             return null;
+        }
+
+        private void StoreInformations(Video video)
+        {
+            string title = "Titel: " + video.Title + Environment.NewLine;
+            string author = "Autor: " + video.Author.ChannelTitle + Environment.NewLine;
+            string uploadDate = "Upload-Date: " + video.UploadDate.ToString() + Environment.NewLine;
+            string duration = "Duration: " + video.Duration.ToString() + Environment.NewLine;
+            string viewCount = "ViewCount: " + video.Engagement.ViewCount + Environment.NewLine;
+            string likeCount = "LikeCount: " + video.Engagement.LikeCount + Environment.NewLine;
+            IEnumerable<string> tags = video.Keywords;
+            string allTags = "Tags: ";
+
+            foreach(string tag in tags)
+            {
+                allTags += tag + ", ";
+            }
+            allTags += Environment.NewLine;
+
+            videoInformation = title + author + uploadDate + duration + viewCount + likeCount + allTags + Environment.NewLine;
         }
 
         private void HandleException(Exception ex)

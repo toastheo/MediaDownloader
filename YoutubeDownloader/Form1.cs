@@ -39,6 +39,11 @@ namespace YoutubeDownloader
         private bool reEncodeAudio = false;
         private bool reEncodeVideo = false;
 
+        private bool isAdvancedInfoShow = false;
+        private string videoInformation = string.Empty;
+        private Size originalSize;
+        private Size expandedSize;
+
         // download formats have to be in the same order like in the FormatBox
         private enum DownloadFormat
         {
@@ -55,7 +60,6 @@ namespace YoutubeDownloader
 
         public Form1()
         {
-
             InitializeComponent();
             LoadFontFromRessources();
             InitFonts();
@@ -70,6 +74,11 @@ namespace YoutubeDownloader
             // determines the ffmpeg path
             string currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             ffmpegPath = Path.Combine(currentDirectory, "ffmpeg.exe");
+
+            // defines original and expanded size
+            originalSize = new Size(792, 540);
+            expandedSize = new Size(792, 881);
+            Size = originalSize;
         }
 
         // EVENTS //
@@ -174,6 +183,19 @@ namespace YoutubeDownloader
             ReencodeVideoCheck.Enabled = isEnabled;
             ReencodeAudioCheck.Enabled = isEnabled;
             ASettingsLabel.Enabled = isEnabled;
+        }
+
+        // Expands the window if the user wants to display advanced informations
+        private void AdvancedInformationsCheck_CheckedChanged(object sender, EventArgs e)
+        {
+            if (AdvancedInformationsCheck.Checked)
+            {
+                Size = expandedSize;
+            }
+            else
+            {
+                Size = originalSize;
+            }
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)

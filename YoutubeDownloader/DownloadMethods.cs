@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AngleSharp.Io;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -36,6 +37,9 @@ namespace YoutubeDownloader
             try
             {
                 Video video = await youtube.Videos.GetAsync(url);
+                StoreInformations(video);
+                AdvancedInformationsTextBox.Text = videoInformation;
+
                 videoDuration = (TimeSpan)video.Duration;
                 ProgressTextBox.Text = $"Downloading \"{video.Title}\"" + Environment.NewLine + "Please wait!";
 
@@ -123,7 +127,17 @@ namespace YoutubeDownloader
                     videoFileName = $"{downloadPath}\\{sanitizedTitle}_video.{videoStreamInfo.Container}";
                     audioFileName = $"{downloadPath}\\{sanitizedTitle}_audio.{audioStreamInfo.Container}";
 
-                    Progress<double> progressHandler = new Progress<double>(percent => ProgressBar.Value = (int)(percent * 100));
+                    // watch progress
+                    string downloadType = "Downloading Video ..." + Environment.NewLine;
+                    Progress<double> progressHandler = new Progress<double>(percent =>
+                    {
+                        // update progressbar
+                        ProgressBar.Value = (int)(percent * 100);
+
+                        // update advanced informations box
+                        string progressText = $"Download progress: {(int)(percent * 100)}%";
+                        AdvancedInformationsTextBox.Text = videoInformation + downloadType + progressText;
+                    });
 
                     // try to download the video
                     ProgressLabel.Text = "Downloading Video ...";
@@ -135,6 +149,7 @@ namespace YoutubeDownloader
                     // try to download the audio
                     ProgressLabel.Text = "Downloading Audio ...";
                     StepLabel.Text = "Step 2 of 3";
+                    downloadType = "Downloading audio ..." + Environment.NewLine;
 
                     cancellationToken.ThrowIfCancellationRequested();
                     await youtube.Videos.Streams.DownloadAsync(audioStreamInfo, audioFileName, progressHandler, cancellationToken);
@@ -197,6 +212,7 @@ namespace YoutubeDownloader
                     ProgressBar.Value = 0;
                     ProgressLabel.Text = "";
                     ProgressTextBox.SelectionColor = ProgressTextBox.ForeColor;
+                    AdvancedInformationsTextBox.Text = "Waiting for Download...";
                 }
                 if (StepLabel != null && !StepLabel.IsDisposed)
                     StepLabel.Text = "";
@@ -208,6 +224,9 @@ namespace YoutubeDownloader
             try
             {
                 Video video = await youtube.Videos.GetAsync(url);
+                StoreInformations(video);
+                AdvancedInformationsTextBox.Text = videoInformation;
+
                 videoDuration = (TimeSpan)video.Duration;
                 ProgressTextBox.Text = $"Downloading \"{video.Title}\"";
 
@@ -222,7 +241,17 @@ namespace YoutubeDownloader
                     string sanitizedTitle = SanitizeFileName(video.Title);
                     audioFileName = $"{downloadPath}\\{sanitizedTitle}.webm";
 
-                    Progress<double> progressHandler = new Progress<double>(percent => ProgressBar.Value = (int)(percent * 100));
+                    // watch progress
+                    string downloadType = "Downloading audio ..." + Environment.NewLine;
+                    Progress<double> progressHandler = new Progress<double>(percent =>
+                    {
+                        // update progressbar
+                        ProgressBar.Value = (int)(percent * 100);
+
+                        // update advanced informations box
+                        string progressText = $"Download progress: {(int)(percent * 100)}%";
+                        AdvancedInformationsTextBox.Text = videoInformation + downloadType + progressText;
+                    });
 
                     // try to download the audio
                     ProgressLabel.Text = "Downloading Audio ...";
@@ -288,6 +317,7 @@ namespace YoutubeDownloader
                     ProgressBar.Value = 0;
                     ProgressLabel.Text = "";
                     ProgressTextBox.SelectionColor = ProgressTextBox.ForeColor;
+                    AdvancedInformationsTextBox.Text = "Waiting for Download...";
                 }
                 if (StepLabel != null && !StepLabel.IsDisposed)
                     StepLabel.Text = "";
