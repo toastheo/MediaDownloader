@@ -39,7 +39,6 @@ namespace YoutubeDownloader
         private bool reEncodeAudio = false;
         private bool reEncodeVideo = false;
 
-        private bool isAdvancedInfoShow = false;
         private string videoInformation = string.Empty;
         private Size originalSize;
         private Size expandedSize;

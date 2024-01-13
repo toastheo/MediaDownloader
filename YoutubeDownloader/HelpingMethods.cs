@@ -140,7 +140,7 @@ namespace YoutubeDownloader
             return null;
         }
 
-        private void StoreInformations(Video video)
+        private static string StoreInformations(Video video)
         {
             string title = "Titel: " + video.Title + Environment.NewLine;
             string author = "Autor: " + video.Author.ChannelTitle + Environment.NewLine;
@@ -151,13 +151,20 @@ namespace YoutubeDownloader
             IEnumerable<string> tags = video.Keywords;
             string allTags = "Tags: ";
 
-            foreach(string tag in tags)
+            if (tags.Any())
             {
-                allTags += tag + ", ";
+                foreach (string tag in tags)
+                {
+                    allTags += tag + ", ";
+                }
+                allTags += Environment.NewLine;
             }
-            allTags += Environment.NewLine;
+            else
+            {
+                allTags += "No tags" + Environment.NewLine;
+            }
 
-            videoInformation = title + author + uploadDate + duration + viewCount + likeCount + allTags + Environment.NewLine;
+            return title + author + uploadDate + duration + viewCount + likeCount + allTags + Environment.NewLine;
         }
 
         private void HandleException(Exception ex)

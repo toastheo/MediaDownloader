@@ -76,11 +76,11 @@ namespace YoutubeDownloader
                                 if (AdvancedInformationsTextBox.InvokeRequired)
                                 {
                                     AdvancedInformationsTextBox.Invoke(new Action(() => 
-                                        AdvancedInformationsTextBox.Text = videoInformation + "FFMPEG: " + Environment.NewLine + errorMessage));
+                                        AdvancedInformationsTextBox.Text = videoInformation + "FFMPEG Output: " + Environment.NewLine + errorMessage));
                                 }
                                 else
                                 {
-                                    AdvancedInformationsTextBox.Text = videoInformation + "FFMPEG: " + Environment.NewLine + errorMessage;
+                                    AdvancedInformationsTextBox.Text = videoInformation + "FFMPEG Output: " + Environment.NewLine + errorMessage;
                                 }
                             }
 
@@ -203,11 +203,11 @@ namespace YoutubeDownloader
                                 if (AdvancedInformationsTextBox.InvokeRequired)
                                 {
                                     AdvancedInformationsTextBox.Invoke(new Action(() =>
-                                        AdvancedInformationsTextBox.Text = videoInformation + "FFMPEG: " + Environment.NewLine + errorMessage));
+                                        AdvancedInformationsTextBox.Text = videoInformation + "FFMPEG Output: " + Environment.NewLine + errorMessage));
                                 }
                                 else
                                 {
-                                    AdvancedInformationsTextBox.Text = videoInformation + "FFMPEG: " + Environment.NewLine + errorMessage;
+                                    AdvancedInformationsTextBox.Text = videoInformation + "FFMPEG Output: " + Environment.NewLine + errorMessage;
                                 }
                             }
 
