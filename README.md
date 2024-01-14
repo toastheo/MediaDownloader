@@ -4,7 +4,7 @@ An application for downloading media from the Internet.
 ## Version: 
 1.2.3
 
-## Disclaimer
+## Disclaimer:
 
 Compliance with Terms of Service: The MediaDownloader software is intended solely for educational and research purposes. Users are responsible for ensuring compliance with the Terms of Service of any platform they interact with using this software, including but not limited to YouTube.
 
