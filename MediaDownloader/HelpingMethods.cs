@@ -51,7 +51,7 @@ namespace MediaDownloader
 
         private void LoadFontFromRessources()
         {
-            using (fontStream = GetType().Assembly.GetManifestResourceStream("YoutubeDownloader.Montserrat-VariableFont_wght.ttf"))
+            using (fontStream = GetType().Assembly.GetManifestResourceStream("MediaDownloader.Resources.Montserrat-VariableFont_wght.ttf"))
             {
                 if (fontStream == null)
                 {
