@@ -12,7 +12,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace YoutubeDownloader
+namespace MediaDownloader
 {
     public partial class Form1
     {

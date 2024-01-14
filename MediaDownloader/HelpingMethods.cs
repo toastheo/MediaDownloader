@@ -19,7 +19,7 @@ using System.Windows.Forms;
 using YoutubeExplode.Videos;
 using YoutubeExplode.Videos.Streams;
 
-namespace YoutubeDownloader
+namespace MediaDownloader
 {
     public partial class Form1
     {

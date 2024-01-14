@@ -18,7 +18,7 @@ using YoutubeExplode;
 using System.Drawing.Text;
 using System.Runtime.InteropServices;
 
-namespace YoutubeDownloader
+namespace MediaDownloader
 {
     public partial class Form1 : Form
     {
