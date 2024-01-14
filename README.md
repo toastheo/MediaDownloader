@@ -1,10 +1,10 @@
-# Youtube Downloader
+# Media Downloader
 ## Version: 
 1.2.3
 
 ## Features:
 - Download Videos from Youtube
-- Supported formats: mp4, mkv, webm, flv, mp3, wav, oga, m4a, aac (including re-encoding if needed)
+- Supported formats: mp4, mkv, webm, flv, mp3, wav, oga, m4a, aac (including re-encoding with ffmpeg if needed)
 - Choose quality (360p - 8K)
 
 ## Download Link (OneDrive):
