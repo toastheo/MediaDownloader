@@ -21,6 +21,8 @@ namespace YoutubeDownloader
 
         private async Task MergeVideoAndAudio(string videoPath, string audioPath, string outputPath, string format, CancellationToken cancellationToken)
         {
+            string videoCodec, audioCodec;
+
             // merges audio and video together by using ffmpeg.exe
             if (format != "mp4" && format != "mkv" && format != "webm" && format != "flv")
             {
@@ -42,20 +44,31 @@ namespace YoutubeDownloader
             {
                 case "mp4":
                     startInfo = ProcessMP4(videoPath, audioPath, outputPath, reEncodeVideo, reEncodeAudio);
+                    videoCodec = "libx264"; audioCodec = "aac";
                     break;
                 case "mkv":
                     startInfo = ProcessMKV(videoPath, audioPath, outputPath, reEncodeVideo, reEncodeAudio);
+                    videoCodec = "libx264"; audioCodec = "aac";
                     break;
                 case "webm":
                     startInfo = ProcessWEBM(videoPath, audioPath, outputPath, reEncodeVideo, reEncodeAudio);
+                    videoCodec = "libvpx-vp9"; audioCodec = "libopus";
                     break;
                 case "flv":
                     startInfo = ProcessFLV(videoPath, audioPath, outputPath, reEncodeVideo, reEncodeAudio);
+                    videoCodec = "libx264"; audioCodec = "aac";
                     break;
                 default:
                     _ = MessageBox.Show("Failed to Start Process", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
             }
+
+            // set codec information
+            string codecInfo = Environment.NewLine;
+            if (reEncodeVideo)
+                codecInfo += $"Video codec: {videoCodec}" + Environment.NewLine;
+            if (reEncodeAudio)
+                codecInfo += $"Audio codec: {audioCodec}" + Environment.NewLine;
 
             try
             {
@@ -76,11 +89,11 @@ namespace YoutubeDownloader
                                 if (AdvancedInformationsTextBox.InvokeRequired)
                                 {
                                     AdvancedInformationsTextBox.Invoke(new Action(() => 
-                                        AdvancedInformationsTextBox.Text = videoInformation + "FFMPEG Output: " + Environment.NewLine + errorMessage));
+                                        AdvancedInformationsTextBox.Text = videoInformation + "FFMPEG Output: " + Environment.NewLine + errorMessage + codecInfo));
                                 }
                                 else
                                 {
-                                    AdvancedInformationsTextBox.Text = videoInformation + "FFMPEG Output: " + Environment.NewLine + errorMessage;
+                                    AdvancedInformationsTextBox.Text = videoInformation + "FFMPEG Output: " + Environment.NewLine + errorMessage + codecInfo;
                                 }
                             }
 
@@ -146,7 +159,6 @@ namespace YoutubeDownloader
         private async Task ConvertIntoAudio(string webmPath, string outputPath, string format, CancellationToken cancellationToken)
         {
             // Converts .webm to the given audioformat using ffmpeg.exe
-
             if (format != "mp3" && format != "wav" && format != "oga" && format != "m4a" && format != "aac")
             {
                 _ = MessageBox.Show($"Failed to convert into {format}: Unkown audio format!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);

@@ -16,6 +16,7 @@ using System.Threading;
 using System.Globalization;
 using YoutubeExplode;
 using System.Drawing.Text;
+using System.Runtime.InteropServices;
 
 namespace YoutubeDownloader
 {
@@ -76,7 +77,7 @@ namespace YoutubeDownloader
 
             // defines original and expanded size
             originalSize = new Size(792, 540);
-            expandedSize = new Size(792, 881);
+            expandedSize = new Size(792, 820);
             Size = originalSize;
         }
 
@@ -182,6 +183,18 @@ namespace YoutubeDownloader
             ReencodeVideoCheck.Enabled = isEnabled;
             ReencodeAudioCheck.Enabled = isEnabled;
             ASettingsLabel.Enabled = isEnabled;
+
+            // set recommended advanced settings
+            if (FormatBox.SelectedIndex == (int)DownloadFormat.webm)
+            {
+                ReencodeAudioCheck.Checked = false;
+                ReencodeVideoCheck.Checked = false;
+            }
+            else
+            {
+                ReencodeAudioCheck.Checked = true;
+                ReencodeVideoCheck.Checked = false;
+            }
         }
 
         // Expands the window if the user wants to display advanced informations

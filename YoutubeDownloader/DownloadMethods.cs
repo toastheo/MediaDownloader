@@ -34,6 +34,9 @@ namespace YoutubeDownloader
         private DateTime lastUpdateTime = DateTime.Now;
         private long previousBytes = 0;
         private const double BytesPerMegabyte = 1048576;
+        TimeSpan estimatedRemainingTime;
+        private const int speedMeasurementsToKeep = 10;
+        Queue<double> speedMeasurements = new Queue<double>(speedMeasurementsToKeep);
 
         private async Task DownloadVideoAs(string format, CancellationToken cancellationToken)
         {
@@ -140,43 +143,67 @@ namespace YoutubeDownloader
 
                     // watch progress
                     string downloadType = "Downloading Video ..." + Environment.NewLine;
+
+                    // get total size
+                    totalVideoSize = videoStreamInfo.Size.Bytes;
+                    totalAudioSize = audioStreamInfo.Size.Bytes;
+
                     Progress<double> progressHandler = new Progress<double>(percent =>
                     {
-                        // get total size
-                        totalVideoSize = videoStreamInfo.Size.Bytes;
-                        totalAudioSize = audioStreamInfo.Size.Bytes;
-
                         // update progressbar
                         ProgressBar.Value = (int)(percent * 100);
 
-                        // calculate download speed
                         DateTime currentTime = DateTime.Now;
 
                         if ((currentTime - lastUpdateTime).TotalSeconds >= 1)
                         {
-                            // calculate download speed
                             long currentBytes = isDownloadingVideo ? (long)(percent * videoStreamInfo.Size.Bytes) : (long)(percent * audioStreamInfo.Size.Bytes);
                             double timeDiff = (currentTime - lastUpdateTime).TotalSeconds;
                             long bytesDiff = currentBytes - previousBytes;
 
                             if (timeDiff > 0)
                             {
-                                // calculate speed
+                                // calculate download speed
                                 double speed = bytesDiff / timeDiff / BytesPerMegabyte;  // in MB
                                 string speedText = string.Empty;
 
+                                double averageSpeed = 0;
                                 if (speed >= 0)
+                                {
+                                    if (speedMeasurements.Count >= speedMeasurementsToKeep)
+                                    {
+                                        speedMeasurements.Dequeue();
+                                    }
+                                    speedMeasurements.Enqueue(speed);
+
+                                    averageSpeed = speedMeasurements.Average();      // calculates average speed
+
                                     speedText = $", Speed: {speed:F2} MB/s";
+                                }
 
                                 // progress
                                 string downloadProgress = string.Empty;
                                 downloadProgress += isDownloadingVideo ? $"{(currentBytes / BytesPerMegabyte):F2}MB / {(totalVideoSize / BytesPerMegabyte):F2}MB" : 
                                                                          $"{(currentBytes / BytesPerMegabyte):F2}MB / {(totalAudioSize / BytesPerMegabyte):F2}MB";
-
-                                if (AdvancedInformationsCheck.Checked)
+                                // calculate estimated time
+                                long remainingBytes = isDownloadingVideo ? totalVideoSize - (long)(percent * totalVideoSize) : totalAudioSize - (long)(percent * totalAudioSize);
+                                if (averageSpeed > 0)
                                 {
-                                    string progressText = $"Download progress: {downloadProgress} ({(int)(percent * 100)}%){speedText}";
-                                    AdvancedInformationsTextBox.Text = videoInformation + downloadType + progressText;
+                                    double remainingTimeInSeconds = remainingBytes / (speed * BytesPerMegabyte);
+                                    estimatedRemainingTime = TimeSpan.FromSeconds(remainingTimeInSeconds);
+
+                                    // format display
+                                    string remainingTimeString = Environment.NewLine + "Estimated remaining time: " +
+                                    string.Format("{0:D2}:{1:D2}:{2:D2}",
+                                    estimatedRemainingTime.Hours,
+                                    estimatedRemainingTime.Minutes,
+                                    estimatedRemainingTime.Seconds);
+
+                                    if (AdvancedInformationsCheck.Checked)
+                                    {
+                                        string progressText = $"Download progress: {downloadProgress} ({(int)(percent * 100)}%){speedText}";
+                                        AdvancedInformationsTextBox.Text = videoInformation + downloadType + progressText + remainingTimeString;
+                                    }
                                 }
 
                                 lastUpdateTime = currentTime;
@@ -197,6 +224,7 @@ namespace YoutubeDownloader
                     ProgressLabel.Text = "Downloading Audio ...";
                     StepLabel.Text = "Step 2 of 3";
                     downloadType = "Downloading audio ..." + Environment.NewLine;
+                    speedMeasurements.Clear();
 
                     cancellationToken.ThrowIfCancellationRequested();
                     await youtube.Videos.Streams.DownloadAsync(audioStreamInfo, audioFileName, progressHandler, cancellationToken);
@@ -290,10 +318,12 @@ namespace YoutubeDownloader
 
                     // watch progress
                     string downloadType = "Downloading audio ..." + Environment.NewLine;
+
+                    // get total size
+                    totalAudioSize = audioStreamInfo.Size.Bytes;
+
                     Progress<double> progressHandler = new Progress<double>(percent =>
                     {
-                        // get total size
-                        totalAudioSize = audioStreamInfo.Size.Bytes;
 
                         // update progressbar
                         ProgressBar.Value = (int)(percent * 100);
@@ -314,6 +344,14 @@ namespace YoutubeDownloader
                                 double speed = bytesDiff / timeDiff / BytesPerMegabyte;  // in MB
                                 string speedText = string.Empty;
 
+                                if (speedMeasurements.Count >= speedMeasurementsToKeep)
+                                {
+                                    speedMeasurements.Dequeue();
+                                }
+                                speedMeasurements.Enqueue(speed);
+
+                                double averageSpeed = speedMeasurements.Average();      // calculates average speed
+
                                 if (speed >= 0)
                                     speedText = $", Speed: {speed:F2} MB/s";
 
@@ -321,12 +359,26 @@ namespace YoutubeDownloader
                                 string downloadProgress = string.Empty;
                                 downloadProgress += $"{(currentBytes / BytesPerMegabyte):F2}MB / {(totalAudioSize / BytesPerMegabyte):F2}MB";
 
-                                if (AdvancedInformationsCheck.Checked)
+                                // calculate estimated time
+                                long remainingBytes = totalAudioSize - (long)(percent * totalAudioSize);
+                                if (averageSpeed > 0)
                                 {
-                                    string progressText = $"Download progress: {downloadProgress} ({(int)(percent * 100)}%){speedText}";
-                                    AdvancedInformationsTextBox.Text = videoInformation + downloadType + progressText;
-                                }
+                                    double remainingTimeInSeconds = remainingBytes / (speed * BytesPerMegabyte);
+                                    estimatedRemainingTime = TimeSpan.FromSeconds(remainingTimeInSeconds);
 
+                                    // format display
+                                    string remainingTimeString = Environment.NewLine + "Estimated remaining time: " +
+                                    string.Format("{0:D2}:{1:D2}:{2:D2}",
+                                    estimatedRemainingTime.Hours,
+                                    estimatedRemainingTime.Minutes,
+                                    estimatedRemainingTime.Seconds);
+
+                                    if (AdvancedInformationsCheck.Checked)
+                                    {
+                                        string progressText = $"Download progress: {downloadProgress} ({(int)(percent * 100)}%){speedText}";
+                                        AdvancedInformationsTextBox.Text = videoInformation + downloadType + progressText + remainingTimeString;
+                                    }
+                                }
                                 lastUpdateTime = currentTime;
                                 previousBytes = currentBytes;
                             }
