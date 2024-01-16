@@ -69,3 +69,6 @@ By using MediaDownloader, you agree to comply with the licensing terms of ffmpeg
 ## Download Link (OneDrive):
 
 https://1drv.ms/u/s!ArgwWHbVjXCmj6ZPER-n-JfY7KYxkA?e=zmfJyV
+
+## Screenshots
+![image](https://github.com/toastheo/MediaDownloader/assets/114708595/1a7dde28-7d9c-4f91-8825-18e960e99bb7)
