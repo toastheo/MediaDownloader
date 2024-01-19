@@ -18,6 +18,36 @@ No Warranty: MediaDownloader is provided "as is" without any warranty of any kin
 
 Changes to the Disclaimer: This disclaimer is subject to change at any time and users are encouraged to review it periodically.
 
+## Getting started with the project
+
+To set up and run this project on your own machine, please follow these steps:
+
+### Prerequisites
+
+Ensure you have the following installed:
+
+- .NET Framework 4.8
+- Visual Studio 2022
+
+### Cloning the Repository
+
+First, clone the repository to your local machine.
+You can use:
+`git clone https://github.com/toastheo/MediaDownloader`
+
+### Opening the Solution
+
+Open the '.sln' file in Visual Studio. This file contains all the necessary project settings and structure.
+
+### Restoring NuGet Packages
+
+The project uses NuGet packages. You can restore them by either using the Visual Studio interface or by running the following command in the Package Manager Console:
+`Update-Package -reinstall`
+
+### Troubleshooting
+
+If you encounter any issues, please contact me directly.
+
 ## Features:
 
 - Download Videos from Youtube
