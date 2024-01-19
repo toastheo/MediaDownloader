@@ -1,4 +1,4 @@
-### MediaDownloader License:
+MediaDownloader License:
 The MediaDownloader and unencumbered software released into the public domain.
 
 Anyone is free to copy, modify, publish, use, compile, sell, or
@@ -24,16 +24,17 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 For more information, please refer to <http://unlicense.org/>
 
-### ffmpeg License:
-
+------------------------------------------------------------------------
+ffmpeg License:
 Please note that this software uses ffmpeg, which is a separate software not covered by the Unlicense of MediaDownloader. ffmpeg is licensed under the LGPL-2.1 (or later) or GPL-2.0 (or later) licenses, depending on the build configuration. This affects the redistribution of ffmpeg in binary form.
 
 For detailed information on ffmpeg licensing, please visit https://www.ffmpeg.org/legal.html.
 
-### Costura.Fody and Youtube.Explode License:
+------------------------------------------------------------------------
+Costura.Fody and Youtube.Explode License:
 This software incorporates Costura.Fody and Youtube.Explode, both licensed under the MIT License, a permissive free software license similar to the Unlicense, allowing broad usage and distribution.
-
 For more information on the MIT License, please visit https://opensource.org/licenses/MIT.
 
-### Important Notice:
+------------------------------------------------------------------------
+Important Notice:
 By using MediaDownloader, you agree to comply with the licensing terms of ffmpeg, Costura.Fody, and Youtube.Explode. It is the user's responsibility to ensure compliance with these terms
