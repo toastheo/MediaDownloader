@@ -1,4 +1,4 @@
 *.cache
 *.compressed
 *.pdb
-packages/
+packages/**
