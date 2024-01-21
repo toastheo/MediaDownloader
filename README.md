@@ -79,12 +79,8 @@ Please note that this software uses ffmpeg, which is a separate software not cov
 
 For detailed information on ffmpeg licensing, please visit https://www.ffmpeg.org/legal.html.
 
-### Costura.Fody and Youtube.Explode License:
-This software incorporates Costura.Fody and Youtube.Explode, both licensed under the MIT License, a permissive free software license similar to the Unlicense, allowing broad usage and distribution.
-For more information on the MIT License, please visit https://opensource.org/licenses/MIT.
-
 ### Important Notice:
-By using MediaDownloader, you agree to comply with the licensing terms of ffmpeg, Costura.Fody, and Youtube.Explode. It is the user's responsibility to ensure compliance with these terms.
+By using MediaDownloader, you agree to comply with the licensing terms of ffmpeg. It is the user's responsibility to ensure compliance with these terms.
 
 ## Acknowledgments
 Thanks to the developers of Costury.Fody and Youtube.Explode for their fantastic libaries.
