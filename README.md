@@ -72,15 +72,12 @@ Contributions to the Media Downloader are welcome. Please follow these steps to 
 ## License
 
 ### MediaDownloader License
-This project is licensed under the [MIT License](https://opensource.org/license/mit/).
+This project is licensed under the [MIT-License](https://opensource.org/license/mit/).
 
 ### ffmpeg License:
-Please note that this software uses ffmpeg, which is a separate software not covered by the Unlicense of MediaDownloader. ffmpeg is licensed under the LGPL-2.1 (or later) or GPL-2.0 (or later) licenses, depending on the build configuration. This affects the redistribution of ffmpeg in binary form.
+Please note that this software uses ffmpeg, which is a separate software not covered by the MIT-License of MediaDownloader. ffmpeg is licensed under the LGPL-2.1 (or later) or GPL-2.0 (or later) licenses, depending on the build configuration. This affects the redistribution of ffmpeg in binary form.
 
 For detailed information on ffmpeg licensing, please visit https://www.ffmpeg.org/legal.html.
-
-### Important Notice:
-By using MediaDownloader, you agree to comply with the licensing terms of ffmpeg. It is the user's responsibility to ensure compliance with these terms.
 
 ## Acknowledgments
 Thanks to the developers of Costury.Fody and Youtube.Explode for their fantastic libaries.
