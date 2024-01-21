@@ -72,7 +72,7 @@ Contributions to the Media Downloader are welcome. Please follow these steps to 
 ## License
 
 ### MediaDownloader License
-This project is licensed under the [UNLICENSE](https://unlicense.org).
+This project is licensed under the [MIT License](https://opensource.org/license/mit/).
 
 ### ffmpeg License:
 Please note that this software uses ffmpeg, which is a separate software not covered by the Unlicense of MediaDownloader. ffmpeg is licensed under the LGPL-2.1 (or later) or GPL-2.0 (or later) licenses, depending on the build configuration. This affects the redistribution of ffmpeg in binary form.
