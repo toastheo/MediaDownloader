@@ -29,7 +29,6 @@ namespace MediaDownloader
 
         private long totalVideoSize = 0;
         private long totalAudioSize = 0;
-        private long downloadedSize = 0;
 
         private DateTime lastUpdateTime = DateTime.Now;
         private long previousBytes = 0;
@@ -183,7 +182,7 @@ namespace MediaDownloader
 
                                 // progress
                                 string downloadProgress = string.Empty;
-                                downloadProgress += isDownloadingVideo ? $"{(currentBytes / BytesPerMegabyte):F2}MB / {(totalVideoSize / BytesPerMegabyte):F2}MB" : 
+                                downloadProgress += isDownloadingVideo ? $"{(currentBytes / BytesPerMegabyte):F2}MB / {(totalVideoSize / BytesPerMegabyte):F2}MB" :
                                                                          $"{(currentBytes / BytesPerMegabyte):F2}MB / {(totalAudioSize / BytesPerMegabyte):F2}MB";
                                 // calculate estimated time
                                 long remainingBytes = isDownloadingVideo ? totalVideoSize - (long)(percent * totalVideoSize) : totalAudioSize - (long)(percent * totalAudioSize);
@@ -472,7 +471,7 @@ namespace MediaDownloader
                     cts?.Cancel();
                     if (downloadTask != null)
                         await downloadTask;
-                } 
+                }
                 catch (Exception ex)
                 {
                     HandleException(ex);

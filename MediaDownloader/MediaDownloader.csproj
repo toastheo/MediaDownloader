@@ -254,7 +254,7 @@
     <Compile Include="DownloadMethods.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Exceptions.cs" />
+    <Compile Include="StreamExceptions.cs" />
     <Compile Include="FFMPEGMethods.cs">
       <SubType>Form</SubType>
     </Compile>
