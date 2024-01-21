@@ -44,8 +44,8 @@ ehthumbs.db
 *.resx
 
 ## ASP.NET is web
-wwwroot/
-*.config
+
+
 
 ## .NET Core
 project.lock.json
