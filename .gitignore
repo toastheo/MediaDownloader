@@ -41,11 +41,6 @@ ehthumbs.db
 
 ## Windows Forms auto generated
 *.Designer.cs
-*.resx
-
-## ASP.NET is web
-
-
 
 ## .NET Core
 project.lock.json
