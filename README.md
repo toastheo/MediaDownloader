@@ -12,8 +12,6 @@ No Endorsement of Misuse: This software is provided with the understanding that 
 
 Liability: The developer of MediaDownloader shall not be held liable for any misuse of the software. Users assume all responsibility and risk associated with the use of this software.
 
-No Warranty: MediaDownloader is provided "as is" without any warranty of any kind, either express or implied, including but not limited to the implied warranties of merchantability, fitness for a particular purpose, or non-infringement.
-
 Changes to the Disclaimer: This disclaimer is subject to change at any time and users are encouraged to review it periodically.
 
 ## Features
