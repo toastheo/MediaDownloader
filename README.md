@@ -25,6 +25,12 @@ Changes to the Disclaimer: This disclaimer is subject to change at any time and 
 
 ![image](https://github.com/toastheo/MediaDownloader/assets/114708595/1a7dde28-7d9c-4f91-8825-18e960e99bb7)
 
+## Dependencies
+
+- .NET Framework 4.8
+- Costura.Fody
+- Youtube.Explode
+
 ##  Installation
 
 To use the Media Downloader, follow these steps:
@@ -38,7 +44,7 @@ To use the Media Downloader, follow these steps:
 ### Variant 2:
 
 1. Clone the repository. You can use `git clone https://github.com/toastheo/MediaDownloader`.
-2. Open the solution file in Visual Studio 2022 or higher.
+2. Open the solution file in Visual Studio 2022 or higher (make sure you installed the .NET Framework 4.8).
 3. The project uses NuGet packages. You can restore them by either using the Visual Studio interface or by running the following command in the Package Manager Console: `Update-Package -reinstall`.
 4. Build the solution to resolve dependencies.
 5. Run the application from Visual Studio or the executable in the build directory.
@@ -52,12 +58,6 @@ After launching the application:
 3. Optional: Choose the save location (Default is the default download folder).
 4. Optional: You can also select in the advanced options whether the video or audio stream should be re-converted. If you have problems with playback, activating these options can help. The recommended options are activated by default.
 5. Click the "Start Download" button and the media will download to the specified location.
-
-## Dependencies
-
-- .NET Framework 4.8
-- Costura.Fody
-- Youtube.Explode
 
 ## Contributing
 
