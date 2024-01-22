@@ -43,11 +43,14 @@ To use the Media Downloader, follow these steps:
 
 ### Variant 2:
 
-1. Clone the repository. You can use `git clone https://github.com/toastheo/MediaDownloader`.
-2. Open the solution file in Visual Studio 2022 or higher (make sure you installed the .NET Framework 4.8).
-3. The project uses NuGet packages. You can restore them by either using the Visual Studio interface or by running the following command in the Package Manager Console: `Update-Package -reinstall`.
-4. Build the solution to resolve dependencies.
-5. Run the application from Visual Studio or the executable in the build directory.
+1. Install Visual Studio 2022 and the .NET Framework 4.8. You can download Visual Studio from the official [Visual Studio Website](https://visualstudio.microsoft.com/de/downloads/ "Visual Studio download page").
+2. Clone the repository. You can use `git clone https://github.com/toastheo/MediaDownloader`.
+3. Open the solution file in Visual Studio 2022 or higher.
+4. The project uses NuGet packages. You can restore them by either using the Visual Studio interface or by running the following command in the Package Manager Console: `Update-Package -reinstall`.
+5. Build the solution to resolve dependencies.
+6. Run the application from Visual Studio or the executable in the build directory.
+
+If you encounter any problems that you cannot solve, please contact me.
 
 ## Usage
 
