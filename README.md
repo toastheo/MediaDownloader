@@ -1,4 +1,4 @@
-# Media Downloader (v.1.3.0)
+# Media Downloader (v.1.3.1)
 
 ## Description
 
@@ -36,7 +36,7 @@ To use the Media Downloader, follow these steps:
 
 ### Variant 1 (Prebuild):
 
-1. **Download the Application**: Visit the [MediaDownloader Onedrive link](https://1drv.ms/u/s!ArgwWHbVjXCmj6ZPER-n-JfY7KYxkA?e=zmfJyV "MediaDownloader Onedrive") to download the application.
+1. **Download the Application**: Visit the [MediaDownloader Onedrive link](https://1drv.ms/u/s!ArgwWHbVjXCmj6t-L3TAlhkMf144DA?e=SHXBa5 "MediaDownloader Onedrive") to download the application.
 2. **Extract the .zip file**: After downloading, locate the .zip file in your Downloads folder and right-click to select 'Extract All...' to unzip the contents.
 3. **Run MediaDownloader**: Open the extracted folder and double-click on the 'MediaDownloader' executable to start the application.
 
