@@ -14,6 +14,3 @@ Changelog is only active since version 1.3.0
 
 ### Changed
 - Implemented optimizations to improve the efficiency and performance of the conversion processes.
-
-### Fixed
-- Addressed and resolved specific bugs that were affecting user experience and the overall stability of the application.
