@@ -189,19 +189,24 @@ namespace MediaDownloader
                                 if (averageSpeed > 0)
                                 {
                                     double remainingTimeInSeconds = remainingBytes / (speed * BytesPerMegabyte);
-                                    estimatedRemainingTime = TimeSpan.FromSeconds(remainingTimeInSeconds);
+                                    const long maxTimeSpan = 922337193600;
 
-                                    // format display
-                                    string remainingTimeString = Environment.NewLine + "Estimated remaining time: " +
-                                    string.Format("{0:D2}:{1:D2}:{2:D2}",
-                                    estimatedRemainingTime.Hours,
-                                    estimatedRemainingTime.Minutes,
-                                    estimatedRemainingTime.Seconds);
-
-                                    if (AdvancedInformationsCheck.Checked)
+                                    if (remainingTimeInSeconds <= maxTimeSpan)
                                     {
-                                        string progressText = $"Download progress: {downloadProgress} ({(int)(percent * 100)}%){speedText}";
-                                        AdvancedInformationsTextBox.Text = videoInformation + downloadType + progressText + remainingTimeString;
+                                        estimatedRemainingTime = TimeSpan.FromSeconds(remainingTimeInSeconds);
+
+                                        // format display
+                                        string remainingTimeString = Environment.NewLine + "Estimated remaining time: " +
+                                        string.Format("{0:D2}:{1:D2}:{2:D2}",
+                                        estimatedRemainingTime.Hours,
+                                        estimatedRemainingTime.Minutes,
+                                        estimatedRemainingTime.Seconds);
+
+                                        if (AdvancedInformationsCheck.Checked)
+                                        {
+                                            string progressText = $"Download progress: {downloadProgress} ({(int)(percent * 100)}%){speedText}";
+                                            AdvancedInformationsTextBox.Text = videoInformation + downloadType + progressText + remainingTimeString;
+                                        }
                                     }
                                 }
 
