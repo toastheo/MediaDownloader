@@ -62,16 +62,6 @@ After launching the application:
 4. Optional: You can also select in the advanced options whether the video or audio stream should be re-converted. If you have problems with playback, activating these options can help. The recommended options are activated by default.
 5. Click the "Start Download" button and the media will download to the specified location.
 
-## Contributing
-
-Contributions to the Media Downloader are welcome. Please follow these steps to contribute:
-
-1. Fork the repository.
-2. Create a new branch for your feature `git checkout -b feature/AmazingFeature`.
-3. Commit your changes `git commit -m 'Add some AmazingFeature'`.
-4. Push to the branch `git push origin feature/AmazingFeature`.
-5. Open a Pull Request.
-
 ## How to add ffmpeg to the system path
 
 1. **Download FFmpeg**: First, visit the official [FFmpeg website](https://ffmpeg.org/download.html "Download Page FFmpeg") and download the latest version of FFmpeg for Windows. Usually, this will be a .zip file.
@@ -93,6 +83,3 @@ This project is licensed under the [MIT-License](https://opensource.org/license/
 Please note that this software uses FFmpeg, which is a separate software not covered by the MIT-License of MediaDownloader. FFmpeg is licensed under the LGPL-2.1 (or later) or GPL-2.0 (or later) licenses, depending on the build configuration. This affects the redistribution of FFmpeg in binary form.
 
 For detailed information on FFmpeg licensing, please visit https://www.ffmpeg.org/legal.html.
-
-## Acknowledgments
-Thanks to the developers of Costury.Fody and Youtube.Explode for their fantastic libaries.
